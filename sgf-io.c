@@ -41,11 +41,11 @@ void init_sgf(void) {
  ************************************************************/
 
 int sgf_getc(OFILE* file) {
-
-  
-   return file->buffer[file->ptr];
-    //file->ptr+=1;
-    //return sgf_getc_impl(file);
+  if ( get_fat(file->inode.last)==EOF ){ return -1; }
+  int block_number=0;
+  file->ptr = file->ptr%BLOCK_SIZE;
+  if (file->ptr==0){ sgf_read_block(file, block_number); }  
+  return file->buffer[file->ptr];
 }
 
 
