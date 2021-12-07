@@ -84,8 +84,10 @@ int sgf_seek(OFILE *file, int pos)
      dans le buffer
  ************************************************************/
 
-void sgf_read_block(OFILE *file, int block_number)
-{
+void sgf_read_block(OFILE *file, int block_number){
+
+  //file->buffer[block_number] =  file->inode.first+block_number;
+
   sgf_read_block_impl(file, block_number);
 }
 
