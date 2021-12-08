@@ -61,7 +61,7 @@ int sgf_getochoc(OFILE *file)
     sgf_read_block(file, file->ptr / BLOCK_SIZE);
   }
   int res = file->buffer[file->ptr % BLOCK_SIZE];
-  file->ptr += 2;
+  file->ptr += 8;
   return res;
 }
 
@@ -76,7 +76,7 @@ int sgf_getochocseek(OFILE *file)
     sgf_read_block(file, file->ptr / BLOCK_SIZE);
   }
   int res = file->buffer[file->ptr % BLOCK_SIZE];
-  sgf_seek(file, file->ptr + 2);
+  sgf_seek(file, file->ptr + 8);
   return res;
 }
 /************************************************************
