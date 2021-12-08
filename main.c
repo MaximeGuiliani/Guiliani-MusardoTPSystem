@@ -20,7 +20,7 @@ int main() {
     
     printf("\nCONTENU DE essai.txt\n\n");
     file = sgf_open_read("essai.txt");
-    while ((c = sgf_getc(file)) > 0) {
+    while ((c = sgf_getochocseek(file)) > 0) {
         putchar(c);
     }
     sgf_close(file);

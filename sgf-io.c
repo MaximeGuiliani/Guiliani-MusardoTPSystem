@@ -37,16 +37,48 @@ void init_sgf(void)
      (position à calculer en fonction de ptr).
  ************************************************************/
 
-int sgf_getc(OFILE *file){
-  if (file->ptr >= file->inode.size){
+int sgf_getc(OFILE *file)
+{
+  if (file->ptr >= file->inode.size)
+  {
     return -1;
   }
-  if (file->ptr%BLOCK_SIZE == 0){
-    sgf_read_block(file, file->ptr/BLOCK_SIZE);
+  if (file->ptr % BLOCK_SIZE == 0)
+  {
+    sgf_read_block(file, file->ptr / BLOCK_SIZE);
   }
-  return file->buffer[file->ptr++%BLOCK_SIZE];
+  return file->buffer[file->ptr++ % BLOCK_SIZE];
 }
 
+int sgf_getochoc(OFILE *file)
+{
+  if (file->ptr >= file->inode.size)
+  {
+    return -1;
+  }
+  if (file->ptr % BLOCK_SIZE == 0)
+  {
+    sgf_read_block(file, file->ptr / BLOCK_SIZE);
+  }
+  int res = file->buffer[file->ptr % BLOCK_SIZE];
+  file->ptr += 2;
+  return res;
+}
+
+int sgf_getochocseek(OFILE *file)
+{
+  if (file->ptr >= file->inode.size)
+  {
+    return -1;
+  }
+  if (file->ptr % BLOCK_SIZE == 0)
+  {
+    sgf_read_block(file, file->ptr / BLOCK_SIZE);
+  }
+  int res = file->buffer[file->ptr % BLOCK_SIZE];
+  sgf_seek(file, file->ptr + 2);
+  return res;
+}
 /************************************************************
  Déplacer le pointeur associé au fichier ouvert en lecture
  (ptr donc) en utilisant le paramètre pos.
@@ -66,8 +98,18 @@ int sgf_getc(OFILE *file){
 
 int sgf_seek(OFILE *file, int pos)
 {
-  fprintf(stderr, "fonction sgf_seek() à terminer.\n");
-  exit(EXIT_FAILURE);
+  assert(file->mode == READ_MODE);
+  if (file->ptr >= file->inode.size || file->ptr < 0)
+  {
+    return -1;
+  }
+
+  if (pos / BLOCK_SIZE != file->ptr / BLOCK_SIZE)
+  { // si sont pas dans le meme bloc => update buffer
+    sgf_read_block(file, pos / BLOCK_SIZE);
+  }
+  file->ptr = pos;
+  return 0;
 }
 
 /************************************************************
@@ -84,16 +126,16 @@ int sgf_seek(OFILE *file, int pos)
      dans le buffer
  ************************************************************/
 
-void sgf_read_block(OFILE *file, int block_number){
+void sgf_read_block(OFILE *file, int block_number)
+{
 
   int adr_current_block = file->inode.first;
   int i;
-  while (i=0, i<block_number, i++) {
+  for (i = 0; i < block_number; i++)
+  {
     adr_current_block = get_fat(adr_current_block);
   }
-  read_block(adr_current_block, file->buffer);
-
-  //sgf_read_block_impl(file, block_number);
+  read_block(adr_current_block, &(file->buffer));
 }
 
 /************************************************************

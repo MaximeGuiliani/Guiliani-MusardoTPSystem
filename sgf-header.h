@@ -164,6 +164,10 @@ OFILE* sgf_open_read(const char *nom);
 
 /* lecture d'un caractère (-1 si EOF) */
 int sgf_getc (OFILE* f);
+int sgf_getochoc (OFILE* f);
+int sgf_getochocseek (OFILE* f);
+
+
 
 /* déplacement dans le fichier (accès direct) */
 int sgf_seek (OFILE* f, int pos);
