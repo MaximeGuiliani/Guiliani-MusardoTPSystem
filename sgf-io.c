@@ -159,7 +159,23 @@ void sgf_read_block(OFILE *file, int block_number)
 
 void sgf_append_block(OFILE *file)
 {
-  sgf_append_block_impl(file);
+  int adr_block = alloc_block();
+  assert(adr_block >0);
+  write_block(adr_block, &(file->buffer));
+  set_fat(adr_block, FAT_EOF);
+  if (file->inode.first == EOF )
+  {
+    file->inode.first = adr_block;
+    file->inode.last = adr_block;
+  }
+  else
+  {
+    set_fat(file->inode.last, adr_block);
+    file->inode.last = adr_block;
+  }
+      write_inode(file->adr_inode, file->inode);
+
+  //sgf_append_block_impl(file);
 }
 
 /************************************************************
@@ -182,9 +198,7 @@ void sgf_putc(OFILE *file, char c)
   if (file->ptr % BLOCK_SIZE == 0)
   {
     sgf_append_block(file);
-
   }
-
 }
 
 /************************************************************
