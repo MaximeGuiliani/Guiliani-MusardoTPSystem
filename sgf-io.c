@@ -86,9 +86,14 @@ int sgf_seek(OFILE *file, int pos)
 
 void sgf_read_block(OFILE *file, int block_number){
 
-  //file->buffer[block_number] =  file->inode.first+block_number;
+  int adr_current_block = file->inode.first;
+  int i;
+  while (i=0, i<block_number, i++) {
+    adr_current_block = get_fat(adr_current_block);
+  }
+  read_block(adr_current_block, file->buffer);
 
-  sgf_read_block_impl(file, block_number);
+  //sgf_read_block_impl(file, block_number);
 }
 
 /************************************************************
