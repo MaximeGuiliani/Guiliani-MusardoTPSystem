@@ -175,7 +175,16 @@ void sgf_append_block(OFILE *file)
 
 void sgf_putc(OFILE *file, char c)
 {
-  sgf_putc_impl(file, c);
+
+  file->buffer[file->ptr % BLOCK_SIZE] = c;
+  file->ptr++;
+
+  if (file->ptr % BLOCK_SIZE == 0)
+  {
+    sgf_append_block(file);
+
+  }
+
 }
 
 /************************************************************
