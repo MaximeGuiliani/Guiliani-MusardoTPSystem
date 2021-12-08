@@ -39,6 +39,8 @@ void init_sgf(void)
 
 int sgf_getc(OFILE *file)
 {
+      assert (file->mode == READ_MODE);
+
   if (file->ptr >= file->inode.size)
   {
     return -1;
@@ -157,25 +159,28 @@ void sgf_read_block(OFILE *file, int block_number)
      - écrire l'INODE sur disque
  ************************************************************/
 
-void sgf_append_block(OFILE *file)
-{
+void sgf_append_block(OFILE *file){
   int adr_block = alloc_block();
-  assert(adr_block >0);
-  write_block(adr_block, &(file->buffer));
+  assert(adr_block > 0);
+  write_block(adr_block, &file->buffer);
   set_fat(adr_block, FAT_EOF);
-  if (file->inode.first == EOF )
-  {
+  if (file->inode.first == FAT_EOF){
     file->inode.first = adr_block;
     file->inode.last = adr_block;
+
+
   }
-  else
-  {
+  else{
     set_fat(file->inode.last, adr_block);
     file->inode.last = adr_block;
-  }
-      write_inode(file->adr_inode, file->inode);
 
-  //sgf_append_block_impl(file);
+      
+
+  }
+      file->inode.size = file->ptr;
+
+  
+  write_inode(file->adr_inode, file->inode);
 }
 
 /************************************************************
@@ -226,8 +231,24 @@ void sgf_puts(OFILE *file, char *s)
 
 void sgf_remove(int adr_inode)
 {
-  sgf_remove_impl(adr_inode);
-}
+  int adr, index;
+  double compt;
+  adr = read_inode(adr_inode).first;
+	while(adr!=FAT_EOF){
+		index=adr;
+		adr=get_fat(index);
+		set_fat(index,FAT_FREE);
+	}
+	set_fat(adr_inode,FAT_FREE);
+
+	for(int i=0;i<get_disk_size();i++){
+		if(get_fat(i)==FAT_FREE){
+			compt++;
+		}
+	}
+  	printf("Nombre de blocs libres : %f\n",compt);
+
+	}
 
 /************************************************************
  Créer un inode vide, initialiser l'INODE passé en paramètre
@@ -319,5 +340,9 @@ OFILE *sgf_open_read(const char *nom)
 
 void sgf_close(OFILE *file)
 {
-  sgf_close_impl(file);
+  if (file->mode == WRITE_MODE && file->ptr % BLOCK_SIZE != 0)
+  {
+    sgf_append_block(file);
+  }
+  free(file);
 }

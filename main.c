@@ -29,7 +29,6 @@ int main()
     sgf_puts(file, "plusieurs blocs.LPM\n");
     sgf_close(file);
 
-    
     file = sgf_open_read("essai.txt");
     while ((c = sgf_getc(file)) > 0) {
         putchar(c);
@@ -41,10 +40,5 @@ int main()
     while ((c = sgf_getochocseek(file)) > 0) {
         putchar(c);
     } */
-
-    
-
-
-
     return (EXIT_SUCCESS);
 }
