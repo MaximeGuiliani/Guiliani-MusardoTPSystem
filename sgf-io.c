@@ -329,6 +329,38 @@ OFILE *sgf_open_read(const char *nom)
   return (file);
 }
 
+
+/************************************************************
+ Ouvrir un fichier en lecture seulement (NULL si échec).
+ ************************************************************/
+
+OFILE *sgf_open_append(const char *nom)
+{
+  int adr_inode;
+  INODE inode;
+  OFILE *file;
+
+  /* Chercher le fichier dans le répertoire */
+  adr_inode = find_inode(nom);
+  if (adr_inode < 0)
+    return (NULL);
+
+  /* lire l'INODE */
+  inode = read_inode(adr_inode);
+
+  /* Allouer une structure OFILE */
+  file = malloc(sizeof(OFILE));
+  if (file == NULL)
+    return (NULL);
+
+  file->inode = inode;
+  file->adr_inode = adr_inode;
+  file->mode = READ_MODE;
+  file->ptr = 0;
+
+  return (file);
+}
+
 /************************************************************
  Fermer un fichier ouvert.
 

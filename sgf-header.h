@@ -148,6 +148,7 @@ void list_directory (void);
 typedef enum {
     READ_MODE,         /* Fichier ouvert en lecture         */
     WRITE_MODE,        /* Fichier ouvert en écriture        */
+    APPEND_MODE         /*Fichier en mode ajout             */
 } MODE;
 
 typedef struct {       /* "Un fichier ouvert"               */
@@ -161,6 +162,9 @@ typedef struct {       /* "Un fichier ouvert"               */
 
 /* ouverture en lecture */
 OFILE* sgf_open_read(const char *nom);
+
+/* ouverture en mode ajout */
+OFILE* sgf_open_append(const char *nom);
 
 /* lecture d'un caractère (-1 si EOF) */
 int sgf_getc (OFILE* f);
